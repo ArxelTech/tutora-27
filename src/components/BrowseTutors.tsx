@@ -2,89 +2,108 @@ import { TutorCard } from "@/components/TutorCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Search, Filter } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
-// Mock data for tutors
-const mockTutors = [
-  {
-    id: "1",
-    name: "Sarah Johnson",
-    image: "https://images.unsplash.com/photo-1494790108755-2616c22777dd?w=400&h=300&fit=crop&crop=face",
-    subjects: ["Mathematics", "Physics", "Chemistry"],
-    rating: 4.9,
-    reviewsCount: 127,
-    location: "New York, NY",
-    experience: "5 years",
-    hourlyRate: 45,
-    bio: "Experienced math and science tutor with a passion for helping students overcome challenges and build confidence in STEM subjects."
-  },
-  {
-    id: "2",
-    name: "Michael Chen",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=300&fit=crop&crop=face",
-    subjects: ["English", "Literature", "Writing"],
-    rating: 4.8,
-    reviewsCount: 89,
-    location: "Los Angeles, CA",
-    experience: "8 years",
-    hourlyRate: 40,
-    bio: "English literature specialist with expertise in creative writing and essay composition. Published author and former English teacher."
-  },
-  {
-    id: "3",
-    name: "Emily Rodriguez",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=300&fit=crop&crop=face",
-    subjects: ["Spanish", "French", "ESL"],
-    rating: 4.9,
-    reviewsCount: 156,
-    location: "Miami, FL",
-    experience: "6 years",
-    hourlyRate: 35,
-    bio: "Multilingual educator specializing in language acquisition and cultural immersion techniques for effective language learning."
-  },
-  {
-    id: "4",
-    name: "David Kim",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop&crop=face",
-    subjects: ["Computer Science", "Programming", "Math"],
-    rating: 4.9,
-    reviewsCount: 93,
-    location: "Seattle, WA", 
-    experience: "4 years",
-    hourlyRate: 55,
-    bio: "Software engineer turned educator, specializing in programming fundamentals and computer science concepts for all ages."
-  },
-  {
-    id: "5",
-    name: "Lisa Thompson",
-    image: "https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=400&h=300&fit=crop&crop=face",
-    subjects: ["Biology", "Chemistry", "Environmental Science"],
-    rating: 4.8,
-    reviewsCount: 74,
-    location: "Chicago, IL",
-    experience: "7 years",
-    hourlyRate: 42,
-    bio: "Biology PhD with extensive research experience, passionate about making complex scientific concepts accessible and engaging."
-  },
-  {
-    id: "6",
-    name: "Robert Martinez",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=300&fit=crop&crop=face",
-    subjects: ["History", "Social Studies", "Geography"],
-    rating: 4.7,
-    reviewsCount: 68,
-    location: "Austin, TX",
-    experience: "9 years",
-    hourlyRate: 38,
-    bio: "History professor with a knack for bringing the past to life through engaging storytelling and interactive lessons."
-  }
-];
+type Tutor = {
+  id: string;
+  name: string;
+  image: string | null;
+  subjects: string[];
+  rating: number;
+  reviewsCount: number;
+  location: string;
+  experience: string;
+  hourlyRate: number;
+  bio: string | null;
+};
+
+const TutorCardSkeleton = () => (
+  <div className="space-y-4">
+    <Skeleton className="h-48 w-full rounded-lg" />
+    <div className="space-y-2">
+      <Skeleton className="h-4 w-3/4" />
+      <Skeleton className="h-4 w-1/2" />
+      <Skeleton className="h-4 w-full" />
+      <Skeleton className="h-4 w-2/3" />
+    </div>
+  </div>
+);
 
 const popularSubjects = [
   "Mathematics", "English", "Science", "History", "Languages", "Computer Science", "Art", "Music"
 ];
 
 export function BrowseTutors() {
+  const [tutors, setTutors] = useState<Tutor[]>([]);
+  const [filteredTutors, setFilteredTutors] = useState<Tutor[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    fetchTutors();
+  }, []);
+
+  useEffect(() => {
+    filterTutors();
+  }, [tutors, searchQuery]);
+
+  const fetchTutors = async () => {
+    try {
+      const { data: coaches, error } = await supabase
+        .from('Coach')
+        .select('*')
+        .eq('is_approved', true);
+
+      if (error) {
+        console.error('Error fetching tutors:', error);
+        return;
+      }
+
+      const formattedTutors: Tutor[] = coaches?.map(coach => ({
+        id: coach.id,
+        name: coach.name,
+        image: coach.profile_image,
+        subjects: Array.isArray(coach.subjects) ? (coach.subjects as string[]) : [],
+        rating: coach.rating || 0,
+        reviewsCount: 0, // This field doesn't exist in Coach table
+        location: coach.location || '',
+        experience: coach.years_of_experience ? `${coach.years_of_experience} years` : '0 years',
+        hourlyRate: coach.fee || 0,
+        bio: coach.about
+      })) || [];
+
+      setTutors(formattedTutors);
+    } catch (error) {
+      console.error('Error fetching tutors:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filterTutors = () => {
+    if (!searchQuery.trim()) {
+      setFilteredTutors(tutors);
+      return;
+    }
+
+    const filtered = tutors.filter(tutor =>
+      tutor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tutor.subjects.some(subject => 
+        subject.toLowerCase().includes(searchQuery.toLowerCase())
+      ) ||
+      tutor.location.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    setFilteredTutors(filtered);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
   return (
     <section id="browse-tutors" className="py-16 bg-background">
       <div className="container mx-auto px-4">
@@ -106,6 +125,8 @@ export function BrowseTutors() {
               <Input 
                 placeholder="Search by subject, name, or location..."
                 className="pl-10"
+                value={searchQuery}
+                onChange={handleSearchChange}
               />
             </div>
             <Button variant="outline" className="md:w-auto">
@@ -123,6 +144,7 @@ export function BrowseTutors() {
                   key={subject}
                   variant="secondary"
                   className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors"
+                  onClick={() => setSearchQuery(subject)}
                 >
                   {subject}
                 </Badge>
@@ -133,17 +155,31 @@ export function BrowseTutors() {
         
         {/* Tutors Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-          {mockTutors.map((tutor) => (
-            <TutorCard key={tutor.id} {...tutor} />
-          ))}
+          {loading ? (
+            Array.from({ length: 6 }).map((_, index) => (
+              <TutorCardSkeleton key={index} />
+            ))
+          ) : filteredTutors.length > 0 ? (
+            filteredTutors.map((tutor) => (
+              <TutorCard key={tutor.id} {...tutor} />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-lg text-muted-foreground">
+                {searchQuery ? 'No tutors found matching your search.' : 'No tutors available at the moment.'}
+              </p>
+            </div>
+          )}
         </div>
         
         {/* Load More */}
-        <div className="text-center">
-          <Button variant="outline" size="lg">
-            Load More Tutors
-          </Button>
-        </div>
+        {!loading && filteredTutors.length > 0 && (
+          <div className="text-center">
+            <Button variant="outline" size="lg">
+              Load More Tutors
+            </Button>
+          </div>
+        )}
       </div>
     </section>
   );
