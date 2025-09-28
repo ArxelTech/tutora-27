@@ -11,12 +11,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BookOpen, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const tutorApplicationSchema = z.object({
   fullName: z.string().trim().nonempty({ message: "Full name is required" }).max(100, { message: "Name must be less than 100 characters" }),
   email: z.string().trim().email({ message: "Invalid email address" }).max(255, { message: "Email must be less than 255 characters" }),
   linkedinUrl: z.string().trim().url({ message: "Please enter a valid LinkedIn URL" }).optional().or(z.literal("")),
-  yearsOfExperience: z.string().nonempty({ message: "Years of experience is required" }),
+  yearsOfExperience: z.coerce.number().min(0, { message: "Years of experience must be a positive number" }),
   subject: z.string().nonempty({ message: "Please select a subject" }),
 });
 
@@ -32,7 +33,7 @@ export default function TutorApplication() {
       fullName: "",
       email: "",
       linkedinUrl: "",
-      yearsOfExperience: "",
+      yearsOfExperience: 0,
       subject: "",
     }
   });
@@ -41,10 +42,19 @@ export default function TutorApplication() {
     setIsSubmitting(true);
     
     try {
-      // Simulate form submission (no database connection yet)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log("Tutor application submitted:", data);
+      const { error } = await supabase
+        .from('tutor_applications')
+        .insert({
+          full_name: data.fullName,
+          email: data.email,
+          linkedin_url: data.linkedinUrl || null,
+          years_of_experience: data.yearsOfExperience,
+          subject: data.subject,
+        });
+
+      if (error) {
+        throw error;
+      }
       
       toast({
         title: "Application Submitted!",
@@ -53,6 +63,7 @@ export default function TutorApplication() {
       
       form.reset();
     } catch (error) {
+      console.error("Error submitting application:", error);
       toast({
         title: "Submission Failed",
         description: "Something went wrong. Please try again.",
