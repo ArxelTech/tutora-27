@@ -1,0 +1,132 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Education Platform Design System */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    /* Education-focused color palette */
+    --primary: 220 100% 60%; /* Trustworthy blue */
+    --primary-foreground: 0 0% 100%;
+    --primary-dark: 220 100% 45%;
+    --primary-light: 220 100% 85%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 38 100% 65%; /* Warm orange accent */
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 38 100% 90%;
+
+    --success: 142 76% 36%; /* Success green */
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 220 100% 60%;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(220 100% 60%), hsl(250 100% 65%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(220 100% 98%));
+    --gradient-accent: linear-gradient(135deg, hsl(38 100% 65%), hsl(45 100% 70%));
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px hsl(220 100% 60% / 0.1);
+    --shadow-card: 0 2px 10px hsl(220 100% 60% / 0.08);
+    --shadow-button: 0 4px 15px hsl(220 100% 60% / 0.3);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 220 100% 65%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary-dark: 220 100% 50%;
+    --primary-light: 220 100% 90%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 38 100% 70%;
+    --accent-foreground: 0 0% 100%;
+    --accent-light: 38 100% 85%;
+
+    --success: 142 76% 40%;
+    --success-foreground: 0 0% 100%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 220 100% 65%;
+
+    /* Dark mode gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(220 100% 65%), hsl(250 100% 70%));
+    --gradient-card: linear-gradient(145deg, hsl(222.2 84% 4.9%), hsl(220 100% 8%));
+    --gradient-accent: linear-gradient(135deg, hsl(38 100% 70%), hsl(45 100% 75%));
+
+    /* Dark mode shadows */
+    --shadow-soft: 0 4px 20px hsl(220 100% 60% / 0.2);
+    --shadow-card: 0 2px 10px hsl(220 100% 60% / 0.15);
+    --shadow-button: 0 4px 15px hsl(220 100% 60% / 0.4);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
