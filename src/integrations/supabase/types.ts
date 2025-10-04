@@ -62,6 +62,33 @@ export type Database = {
         }
         Relationships: []
       }
+      contact: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: number
+          message: string
+          subject: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: number
+          message: string
+          subject: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: number
+          message?: string
+          subject?: string
+        }
+        Relationships: []
+      }
       tutor_applications: {
         Row: {
           created_at: string
