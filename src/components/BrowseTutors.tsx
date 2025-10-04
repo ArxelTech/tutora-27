@@ -101,12 +101,12 @@ export function BrowseTutors() {
       return;
     }
 
+    const query = searchQuery.toLowerCase();
     const filtered = tutors.filter(tutor =>
-      tutor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tutor.name.toLowerCase().includes(query) ||
       tutor.subjects.some(subject => 
-        subject.toLowerCase().includes(searchQuery.toLowerCase())
-      ) ||
-      tutor.location.toLowerCase().includes(searchQuery.toLowerCase())
+        subject.toLowerCase().includes(query)
+      )
     );
 
     setFilteredTutors(filtered);
