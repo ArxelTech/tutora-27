@@ -52,32 +52,44 @@ export function BrowseTutors() {
 
   const fetchTutors = async () => {
     try {
+      console.log('Fetching tutors from tutor_applications...');
+      
       const { data: applications, error } = await supabase
         .from('tutor_applications')
         .select('*')
         .eq('status', 'approved');
+
+      console.log('Fetch result:', { applications, error });
 
       if (error) {
         console.error('Error fetching tutors:', error);
         return;
       }
 
-      const formattedTutors: Tutor[] = applications?.map(app => ({
+      if (!applications || applications.length === 0) {
+        console.log('No approved tutors found');
+        setTutors([]);
+        setLoading(false);
+        return;
+      }
+
+      const formattedTutors: Tutor[] = applications.map(app => ({
         id: app.id,
         name: app.full_name,
-        image: null, // tutor_applications doesn't have profile image
+        image: null,
         subjects: app.subject ? [app.subject] : [],
-        rating: 0, // tutor_applications doesn't have rating
+        rating: 0,
         reviewsCount: 0,
-        location: '', // tutor_applications doesn't have location
+        location: '',
         experience: app.years_of_experience ? `${app.years_of_experience} years` : '0 years',
-        hourlyRate: 0, // tutor_applications doesn't have hourly rate
+        hourlyRate: 0,
         bio: null
-      })) || [];
+      }));
 
+      console.log('Formatted tutors:', formattedTutors);
       setTutors(formattedTutors);
     } catch (error) {
-      console.error('Error fetching tutors:', error);
+      console.error('Exception while fetching tutors:', error);
     } finally {
       setLoading(false);
     }
