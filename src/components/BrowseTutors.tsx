@@ -52,27 +52,27 @@ export function BrowseTutors() {
 
   const fetchTutors = async () => {
     try {
-      const { data: coaches, error } = await supabase
-        .from('Coach')
+      const { data: applications, error } = await supabase
+        .from('tutor_applications')
         .select('*')
-        .eq('is_approved', true);
+        .eq('status', 'approved');
 
       if (error) {
         console.error('Error fetching tutors:', error);
         return;
       }
 
-      const formattedTutors: Tutor[] = coaches?.map(coach => ({
-        id: coach.id,
-        name: coach.name,
-        image: coach.profile_image,
-        subjects: Array.isArray(coach.subjects) ? (coach.subjects as string[]) : [],
-        rating: coach.rating || 0,
-        reviewsCount: 0, // This field doesn't exist in Coach table
-        location: coach.location || '',
-        experience: coach.years_of_experience ? `${coach.years_of_experience} years` : '0 years',
-        hourlyRate: coach.fee || 0,
-        bio: coach.about
+      const formattedTutors: Tutor[] = applications?.map(app => ({
+        id: app.id,
+        name: app.full_name,
+        image: null, // tutor_applications doesn't have profile image
+        subjects: app.subject ? [app.subject] : [],
+        rating: 0, // tutor_applications doesn't have rating
+        reviewsCount: 0,
+        location: '', // tutor_applications doesn't have location
+        experience: app.years_of_experience ? `${app.years_of_experience} years` : '0 years',
+        hourlyRate: 0, // tutor_applications doesn't have hourly rate
+        bio: null
       })) || [];
 
       setTutors(formattedTutors);
